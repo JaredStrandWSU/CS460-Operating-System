@@ -1,0 +1,4 @@
+mkdisk
+rm a.out
+gcc -m32 main.c util.c OBJ/*.o
+./a.out

@@ -1,0 +1,12 @@
+sudo dd if=/dev/zero of=disk bs=1024 count=1440
+sudo mkfs -b 1024 disk 1440
+
+mkdir A
+
+sudo mount disk A
+(cd A; sudo rmdir lost+found)
+sudo umount A
+
+rmdir A
+
+

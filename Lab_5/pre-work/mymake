@@ -1,0 +1,12 @@
+qemu-system-arm -M versatilepb -m 256M -sd sdimage -kernel LAB5forkexec -serial mon:stdio
+
+
+
+
+
+
+ 
+
+
+
+

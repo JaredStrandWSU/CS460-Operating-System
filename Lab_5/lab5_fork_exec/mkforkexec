@@ -1,0 +1,5 @@
+
+echo ready to go?
+read dummy
+
+qemu-system-arm -M versatilepb -m 256M -sd sdimage -kernel LAB5wait -serial mon:stdio

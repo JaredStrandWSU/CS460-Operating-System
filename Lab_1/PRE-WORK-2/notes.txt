@@ -1,0 +1,6 @@
+notes:
+Get the descriptors to find the Inodes for the File System
+Print out the folders in the File System
+Do the indirect block thing at some point before booting MTX
+Find the MTX inode and set it to IP at 0x9000 so MTX kernel will run
+

@@ -1,0 +1,13 @@
+
+arm-none-eabi-gcc -c -mcpu=arm926ej-s $1.c -o $1.o
+
+
+
+
+
+
+ 
+
+
+
+

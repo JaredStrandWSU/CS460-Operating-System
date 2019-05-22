@@ -1,0 +1,96 @@
+To imbed a binary file in .s file:
+
+1. prepare the binary file: convert it into .o file
+
+arm-none-eabi-objcopy -I binary -O elf32-littlearm -B arm pic pic.o
+nm -S -t d pic.o
+
+--- the nm command will show the symbols in the .o file as FILENAME_start, end,
+size, which are available in the resulting image
+
+00860714 D _binary_pic_end
+00860714 A _binary_pic_size
+00000000 D _binary_pic_start
+----------------------------------------------------------------------
+2. t.ld file:
+ENTRY(start)
+SECTIONS
+{
+  . = 0x10000;
+  .text : {
+      start.o
+      *(.text .rodata)
+  }
+  .data : { *(.data) }
+  .bss : { *(.bss) }
+
+/***** include the RAW binary file as a data sectio ************/
+  .data : { pic.o }
+
+  . = ALIGN(8);
+  . = . + 0x4000; /* 4kB of stack memory */
+  stack_top = .;
+  . = . + 0x4000; /* 4kB of irq stack memory */
+  irq_stack_top = .;
+}
+
+3. In the .c file: access exported symbols
+
+extern char _binary_pic_start, _binary_pic_end;
+
+char *p,*q,*cp,*cq,*tp,*tq,*rp;
+int h,w, csize, row, col;
+char temp[8];
+char *image=(char *)0x400000; // at 4MB
+
+   cp = &_binary_pic_start;
+   kprintf("start=%x end=%x\n", &_binary_pic_start, &_binary_pic_end);
+   csize = &_binary_pic_end - &_binary_pic_start;
+   kprintf("csize = %d\n", csize);
+ 
+  tp = cp; //
+  tq = temp; //
+  memcpy(tq, tp, 4); temp[4] = 0;
+  kprintf("temp=%s\n", temp);
+  rp = temp;
+  while(*rp == ' ') 
+      rp++;
+  h = atoi(rp);
+  tp+=4;
+  memcpy(tq, tp, 4); temp[4] = 0;
+  kprintf("temp=%s\n", temp);
+  rp = temp;
+  while(*rp == ' ') 
+    rp++;
+  w = atoi(rp);
+  
+  kprintf("height=%d width=%d\n", h, w);
+  cp += 8; // skip over 8 byes
+
+  // copy pic image to 4MB
+  image = (char *)0x400000;
+  cq = (char *)image;
+  for (i=0; i<csize; i++){
+      *cq++ = *cp++;
+  }
+
+  // image is at 4MB
+  row = col = end = 0;
+
+  p = image;
+  while(1){
+     pixel = 0;
+     r = *p; g = *(p+1); b = *(p+2);
+     pixel = (b<<16) + (g<<8) + (r);
+ 
+     fb[row*640+col] = pixel;
+     p += 3;                // advance p by 3 bytes
+     col++;
+     if (col >= w){  // to line width of jpg image
+        col = 0;
+        row++;
+     }
+     if (row >= h)
+       break;
+  }
+  uprintf("row=%d\n", row);

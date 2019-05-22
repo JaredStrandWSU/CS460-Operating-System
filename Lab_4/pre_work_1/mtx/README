@@ -1,0 +1,10 @@
+MTX1: base code of a MT system: kfork(), kexit()
+MTX2: with sleep, wakeup
+
+mtx.bin: solution of PreLab4.
+
+To compile and run the 32-bit programs on 64-bit Linux, you need
+   sudo apt install gcc-multilib
+so that gcc -m32 t.c  works.
+
+ 
